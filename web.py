@@ -111,8 +111,8 @@ def generate_style_preview_cached(
     ))
     
     # Generate preview image (small size for speed)
+    # Using default preset (workflows/image_default.json)
     preview_image_path = run_async(reelforge.image(
-        workflow="workflows/t2i_by_local_flux.json",
         prompt=final_prompt,
         width=512,
         height=512

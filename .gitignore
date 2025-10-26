@@ -67,3 +67,8 @@ output
 plans/
 examples/
 repositories/
+
+# Workflows - ignore user customizations but keep defaults
+workflows/*
+!workflows/*_default.json
+!workflows/README.md

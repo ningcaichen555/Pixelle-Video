@@ -140,9 +140,8 @@ class StoryboardProcessorService:
         """Step 2: Generate image using ComfyKit"""
         logger.debug(f"  2/4: Generating image for frame {frame.index}...")
         
-        # Call Image generation
+        # Call Image generation (using default preset)
         image_url = await self.core.image(
-            workflow="workflows/t2i_by_local_flux.json",  # Use existing workflow
             prompt=frame.image_prompt,
             width=config.image_width,
             height=config.image_height

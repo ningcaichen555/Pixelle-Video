@@ -12,7 +12,8 @@ from reelforge.config import load_config
 from reelforge.core.discovery import CapabilityRegistry
 from reelforge.core.mcp_server import reelforge_mcp
 from reelforge.core.config_manager import ConfigManager
-from reelforge.services import LLMService, TTSService, ImageService
+from reelforge.services import LLMService, TTSService
+from reelforge.services.image import ImageService
 
 
 class ReelForgeCore:
@@ -100,10 +101,12 @@ class ReelForgeCore:
         # 3. Create config manager
         self.config_manager = ConfigManager(self.registry, self.config)
         
-        # 4. Initialize services
+        # 4. Initialize capability-based services
         self.llm = LLMService(self.config_manager)
         self.tts = TTSService(self.config_manager)
-        self.image = ImageService(self.config_manager)
+        
+        # Initialize workflow-based services (no capability layer)
+        self.image = ImageService(self.config)
         
         # 5. Initialize content generation services
         from reelforge.services.narration_generator import NarrationGeneratorService
@@ -134,7 +137,7 @@ class ReelForgeCore:
         # This triggers the @reelforge_mcp.tool decorators
         from reelforge.capabilities import llm  # noqa: F401
         from reelforge.capabilities import tts  # noqa: F401
-        from reelforge.capabilities import image  # noqa: F401
+        # Note: image no longer uses capability layer (workflow-based)
     
     @property
     def project_name(self) -> str:
