@@ -17,22 +17,22 @@ llm:
 # DeepSeek:        base_url: "https://api.deepseek.com"                           model: "deepseek-chat"
 # Ollama (Local):  base_url: "http://localhost:11434/v1"                          model: "llama3.2"
 
-# ==================== TTS Configuration ====================
-tts:
-  default: edge  # "edge" (free) or "tts_xxx.json" (ComfyUI workflow)
-
-# ==================== Image Generation Configuration ====================
-image:
-  # Required: Default workflow to use (no fallback)
-  # Options: runninghub/image_default.json (recommended, no local setup)
-  #          selfhost/image_default.json (requires local ComfyUI)
-  default_workflow: runninghub/image_default.json
+# ==================== ComfyUI Configuration ====================
+comfyui:
+  # Global ComfyUI settings
+  comfyui_url: http://127.0.0.1:8188  # ComfyUI server URL (required for selfhost workflows)
+  runninghub_api_key: ""  # RunningHub API key (required for runninghub workflows)
   
-  # Local ComfyUI configuration (required if using selfhost workflows)
-  comfyui_url: http://127.0.0.1:8188
+  # TTS-specific configuration
+  tts:
+    default: selfhost/tts_edge.json  # TTS workflow to use
   
-  # RunningHub cloud configuration (required if using runninghub workflows)
-  runninghub_api_key: ""
-  
-  # Image prompt prefix (optional)
-  prompt_prefix: "Pure white background, minimalist illustration, matchstick figure style, black and white line drawing, simple clean lines"
+  # Image-specific configuration
+  image:
+    # Required: Default workflow to use (no fallback)
+    # Options: runninghub/image_flux.json (recommended, no local setup)
+    #          selfhost/image_flux.json (requires local ComfyUI)
+    default_workflow: runninghub/image_flux.json
+    
+    # Image prompt prefix (optional)
+    prompt_prefix: "Pure white background, minimalist illustration, matchstick figure style, black and white line drawing, simple clean lines"

@@ -147,7 +147,7 @@ uv run streamlit run web/app.py
 
 **ComfyUI 工作流**  
 - 选择图像生成的工作流文件
-- 默认使用 `image_default.json`
+- 默认使用 `image_flux.json`
 - 如果懂 ComfyUI，可以放自己的工作流到 `workflows/` 文件夹
 
 **提示词前缀（Prompt Prefix）**  

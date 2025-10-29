@@ -17,7 +17,7 @@ class ImageService(ComfyBaseService):
     Uses ComfyKit to execute image generation workflows.
     
     Usage:
-        # Use default workflow (workflows/image_default.json)
+        # Use default workflow (workflows/image_flux.json)
         image_url = await reelforge.image(prompt="a cat")
         
         # Use specific workflow
@@ -65,7 +65,7 @@ class ImageService(ComfyBaseService):
         
         Args:
             prompt: Image generation prompt
-            workflow: Workflow filename (default: from config or "image_default.json")
+            workflow: Workflow filename (default: from config or "image_flux.json")
             comfyui_url: ComfyUI URL (optional, overrides config)
             runninghub_api_key: RunningHub API key (optional, overrides config)
             width: Image width
@@ -81,7 +81,7 @@ class ImageService(ComfyBaseService):
             Generated image URL/path
         
         Examples:
-            # Simplest: use default workflow (workflows/image_default.json)
+            # Simplest: use default workflow (workflows/image_flux.json)
             image_url = await reelforge.image(prompt="a beautiful cat")
             
             # Use specific workflow

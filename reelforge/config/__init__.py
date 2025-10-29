@@ -17,7 +17,7 @@ Usage:
     if config_manager.validate():
         print("Config is valid!")
 """
-from .schema import ReelForgeConfig, LLMConfig, TTSConfig, ImageConfig
+from .schema import ReelForgeConfig, LLMConfig, ComfyUIConfig, TTSSubConfig, ImageSubConfig
 from .manager import ConfigManager
 from .loader import load_config_dict, save_config_dict
 
@@ -27,8 +27,9 @@ config_manager = ConfigManager()
 __all__ = [
     "ReelForgeConfig",
     "LLMConfig", 
-    "TTSConfig",
-    "ImageConfig",
+    "ComfyUIConfig",
+    "TTSSubConfig",
+    "ImageSubConfig",
     "ConfigManager",
     "config_manager",
     "load_config_dict",

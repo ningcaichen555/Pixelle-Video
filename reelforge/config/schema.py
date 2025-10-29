@@ -13,32 +13,37 @@ class LLMConfig(BaseModel):
     model: str = Field(default="", description="LLM Model Name")
 
 
-class TTSConfig(BaseModel):
-    """TTS configuration"""
+class TTSSubConfig(BaseModel):
+    """TTS-specific configuration (under comfyui.tts)"""
     model_config = {"populate_by_name": True}  # Allow both field name and alias
     
-    default_workflow: str = Field(default="edge", description="Default TTS workflow", alias="default")
+    default_workflow: str = Field(default=None, description="Default TTS workflow (required, no fallback)", alias="default")
 
 
-class ImageConfig(BaseModel):
-    """Image generation configuration"""
+class ImageSubConfig(BaseModel):
+    """Image-specific configuration (under comfyui.image)"""
     model_config = {"populate_by_name": True}  # Allow both field name and alias
     
     default_workflow: str = Field(default=None, description="Default image workflow (required, no fallback)", alias="default")
-    comfyui_url: str = Field(default="http://127.0.0.1:8188", description="ComfyUI Server URL")
-    runninghub_api_key: str = Field(default="", description="RunningHub API Key (optional)")
     prompt_prefix: str = Field(
         default="Pure white background, minimalist illustration, matchstick figure style, black and white line drawing, simple clean lines",
         description="Prompt prefix for all image generation"
     )
 
 
+class ComfyUIConfig(BaseModel):
+    """ComfyUI configuration (includes global settings and service-specific configs)"""
+    comfyui_url: str = Field(default="http://127.0.0.1:8188", description="ComfyUI Server URL")
+    runninghub_api_key: str = Field(default="", description="RunningHub API Key (optional)")
+    tts: TTSSubConfig = Field(default_factory=TTSSubConfig, description="TTS-specific configuration")
+    image: ImageSubConfig = Field(default_factory=ImageSubConfig, description="Image-specific configuration")
+
+
 class ReelForgeConfig(BaseModel):
     """ReelForge main configuration"""
     project_name: str = Field(default="ReelForge", description="Project name")
     llm: LLMConfig = Field(default_factory=LLMConfig)
-    tts: TTSConfig = Field(default_factory=TTSConfig)
-    image: ImageConfig = Field(default_factory=ImageConfig)
+    comfyui: ComfyUIConfig = Field(default_factory=ComfyUIConfig)
     
     def is_llm_configured(self) -> bool:
         """Check if LLM is properly configured"""

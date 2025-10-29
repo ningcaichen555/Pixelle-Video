@@ -100,11 +100,11 @@ def render_advanced_settings():
     
     # Expand if not configured, collapse if configured
     with st.expander(tr("settings.title"), expanded=not is_configured):
-        # 2-column layout: LLM | Image
-        llm_col, image_col = st.columns(2)
+        # 2-column layout: LLM | ComfyUI
+        llm_col, comfyui_col = st.columns(2)
         
         # ====================================================================
-        # Column 1: LLM Settings (Simplified 3-field format)
+        # Column 1: LLM Settings
         # ====================================================================
         with llm_col:
             with st.container(border=True):
@@ -195,21 +195,21 @@ def render_advanced_settings():
                 )
         
         # ====================================================================
-        # Column 2: Image Settings
+        # Column 2: ComfyUI Settings
         # ====================================================================
-        with image_col:
+        with comfyui_col:
             with st.container(border=True):
-                st.markdown(f"**{tr('settings.image.title')}**")
+                st.markdown(f"**{tr('settings.comfyui.title')}**")
                 
                 # Get current configuration
-                image_config = config_manager.get_image_config()
+                comfyui_config = config_manager.get_comfyui_config()
                 
                 # Local/Self-hosted ComfyUI configuration
-                st.markdown(f"**{tr('settings.image.local_title')}**")
+                st.markdown(f"**{tr('settings.comfyui.local_title')}**")
                 comfyui_url = st.text_input(
-                    tr("settings.image.comfyui_url"),
-                    value=image_config.get("comfyui_url", "http://127.0.0.1:8188"),
-                    help=tr("settings.image.comfyui_url_help"),
+                    tr("settings.comfyui.comfyui_url"),
+                    value=comfyui_config.get("comfyui_url", "http://127.0.0.1:8188"),
+                    help=tr("settings.comfyui.comfyui_url_help"),
                     key="comfyui_url_input"
                 )
                 
@@ -228,12 +228,12 @@ def render_advanced_settings():
                 st.markdown("---")
                 
                 # RunningHub cloud configuration
-                st.markdown(f"**{tr('settings.image.cloud_title')}**")
+                st.markdown(f"**{tr('settings.comfyui.cloud_title')}**")
                 runninghub_api_key = st.text_input(
-                    tr("settings.image.runninghub_api_key"),
-                    value=image_config.get("runninghub_api_key", ""),
+                    tr("settings.comfyui.runninghub_api_key"),
+                    value=comfyui_config.get("runninghub_api_key", ""),
                     type="password",
-                    help=tr("settings.image.runninghub_api_key_help"),
+                    help=tr("settings.comfyui.runninghub_api_key_help"),
                     key="runninghub_api_key_input"
                 )
         
@@ -250,8 +250,8 @@ def render_advanced_settings():
                     if llm_api_key and llm_base_url and llm_model:
                         config_manager.set_llm_config(llm_api_key, llm_base_url, llm_model)
                     
-                    # Save Image configuration
-                    config_manager.set_image_config(
+                    # Save ComfyUI configuration
+                    config_manager.set_comfyui_config(
                         comfyui_url=comfyui_url if comfyui_url else None,
                         runninghub_api_key=runninghub_api_key if runninghub_api_key else None
                     )
@@ -380,53 +380,12 @@ def main():
                 st.info(tr("video.frames_fixed_mode_hint"))
         
         # ====================================================================
-        # Audio Settings (Voice + BGM)
+        # Audio Settings (BGM + TTS)
         # ====================================================================
         with st.container(border=True):
             st.markdown(f"**{tr('section.audio_settings')}**")
             
-            # Voice selection
-            st.markdown(f"**{tr('voice.title')}**")
-            voice_id = st.selectbox(
-                "Voice",
-                [
-                    "zh-CN-YunjianNeural",  # 男声-专业
-                    "zh-CN-YunxiNeural",    # 男声-年轻
-                    "zh-CN-XiaoxiaoNeural", # 女声-温柔
-                    "zh-CN-XiaoyiNeural",   # 女声-活力
-                ],
-                format_func=lambda x: {
-                    "zh-CN-YunjianNeural": tr("voice.male_professional"),
-                    "zh-CN-YunxiNeural": tr("voice.male_young"),
-                    "zh-CN-XiaoxiaoNeural": tr("voice.female_gentle"),
-                    "zh-CN-XiaoyiNeural": tr("voice.female_energetic"),
-                }[x],
-                label_visibility="collapsed"
-            )
-            
-            # Voice preview button
-            if st.button(tr("voice.preview"), key="preview_voice", use_container_width=True):
-                with st.spinner(tr("voice.previewing")):
-                    try:
-                        # Generate preview audio
-                        preview_text = "大家好，这是一段测试语音。"
-                        
-                        # Use TTS service to generate audio (auto temp path)
-                        audio_path = run_async(reelforge.tts(
-                            text=preview_text,
-                            voice=voice_id
-                        ))
-                        
-                        # Play the audio
-                        if os.path.exists(audio_path):
-                            st.audio(audio_path, format="audio/mp3")
-                        else:
-                            st.error("Failed to generate preview audio")
-                    except Exception as e:
-                        st.error(tr("voice.preview_failed", error=str(e)))
-                        logger.exception(e)
-            
-            # Background music
+            # Background music (moved to top)
             st.markdown(f"**{tr('bgm.title')}**")
             st.caption(tr("bgm.custom_help"))
             
@@ -465,6 +424,78 @@ def main():
             
             # Use full filename for bgm_path (including extension)
             bgm_path = None if bgm_choice == tr("bgm.none") else bgm_choice
+            
+            
+            # TTS Workflow selection
+            st.markdown(f"**{tr('tts.title')}**")
+            st.caption(tr("tts.workflow_help"))
+            
+            # Get available TTS workflows
+            tts_workflows = reelforge.tts.list_workflows()
+            
+            # Build options for selectbox
+            tts_workflow_options = [wf["display_name"] for wf in tts_workflows]
+            tts_workflow_keys = [wf["key"] for wf in tts_workflows]
+            
+            # Default to saved workflow if exists
+            default_tts_index = 0
+            comfyui_config = config_manager.get_comfyui_config()
+            saved_tts_workflow = comfyui_config["tts"]["default_workflow"]
+            if saved_tts_workflow and saved_tts_workflow in tts_workflow_keys:
+                default_tts_index = tts_workflow_keys.index(saved_tts_workflow)
+            
+            tts_workflow_display = st.selectbox(
+                "TTS Workflow",
+                tts_workflow_options if tts_workflow_options else ["No TTS workflows found"],
+                index=default_tts_index,
+                label_visibility="collapsed",
+                key="tts_workflow_select"
+            )
+            
+            # Get the actual workflow key
+            if tts_workflow_options:
+                tts_selected_index = tts_workflow_options.index(tts_workflow_display)
+                tts_workflow_key = tts_workflow_keys[tts_selected_index]
+            else:
+                tts_workflow_key = "selfhost/tts_edge.json"  # fallback
+            
+            # TTS preview expander (similar to image preview)
+            with st.expander(tr("tts.preview_title"), expanded=False):
+                # Preview text input
+                preview_text = st.text_input(
+                    tr("tts.preview_text"),
+                    value="大家好，这是一段测试语音。",
+                    placeholder=tr("tts.preview_text_placeholder"),
+                    key="tts_preview_text"
+                )
+                
+                # Preview button
+                if st.button(tr("tts.preview_button"), key="preview_tts", use_container_width=True):
+                    with st.spinner(tr("tts.previewing")):
+                        try:
+                            # Generate preview audio using selected workflow
+                            audio_path = run_async(reelforge.tts(
+                                text=preview_text,
+                                workflow=tts_workflow_key
+                            ))
+                            
+                            # Play the audio
+                            if audio_path:
+                                st.success(tr("tts.preview_success"))
+                                if os.path.exists(audio_path):
+                                    st.audio(audio_path, format="audio/mp3")
+                                elif audio_path.startswith('http'):
+                                    st.audio(audio_path)
+                                else:
+                                    st.error("Failed to generate preview audio")
+                                
+                                # Show file path
+                                st.caption(f"📁 {audio_path}")
+                            else:
+                                st.error("Failed to generate preview audio")
+                        except Exception as e:
+                            st.error(tr("tts.preview_failed", error=str(e)))
+                            logger.exception(e)
     
     # ========================================================================
     # Middle Column: Visual Settings (Style & Template)
@@ -484,8 +515,8 @@ def main():
             workflows = reelforge.image.list_workflows()
             
             # Build options for selectbox
-            # Display: "image_default.json - Runninghub"
-            # Value: "runninghub/image_default.json"
+            # Display: "image_flux.json - Runninghub"
+            # Value: "runninghub/image_flux.json"
             workflow_options = [wf["display_name"] for wf in workflows]
             workflow_keys = [wf["key"] for wf in workflows]
             
@@ -493,8 +524,8 @@ def main():
             default_workflow_index = 0
             
             # If user has a saved preference in config, try to match it
-            image_config = config_manager.get_image_config()
-            saved_workflow = image_config.get("default_workflow")
+            comfyui_config = config_manager.get_comfyui_config()
+            saved_workflow = comfyui_config["image"]["default_workflow"]
             if saved_workflow and saved_workflow in workflow_keys:
                 default_workflow_index = workflow_keys.index(saved_workflow)
             
@@ -506,20 +537,19 @@ def main():
                 key="image_workflow_select"
             )
             
-            # Get the actual workflow key (e.g., "runninghub/image_default.json")
+            # Get the actual workflow key (e.g., "runninghub/image_flux.json")
             if workflow_options:
                 workflow_selected_index = workflow_options.index(workflow_display)
                 workflow_key = workflow_keys[workflow_selected_index]
             else:
-                workflow_key = "runninghub/image_default.json"  # fallback
+                workflow_key = "runninghub/image_flux.json"  # fallback
             
             
             # 2. Prompt prefix input
             st.caption(tr("style.prompt_prefix"))
             
             # Get current prompt_prefix from config
-            image_config = config_manager.get_image_config()
-            current_prefix = image_config.get("prompt_prefix", "")
+            current_prefix = comfyui_config["image"]["prompt_prefix"]
             
             # Prompt prefix input (temporary, not saved to config)
             prompt_prefix = st.text_area(
@@ -757,8 +787,8 @@ def main():
                         mode=mode,
                         title=title if title else None,
                         n_scenes=n_scenes,
-                        voice_id=voice_id,
-                        image_workflow=workflow_key,  # Pass workflow key (e.g., "runninghub/image_default.json")
+                        tts_workflow=tts_workflow_key,  # Pass TTS workflow key
+                        image_workflow=workflow_key,  # Pass workflow key (e.g., "runninghub/image_flux.json")
                         frame_template=frame_template,
                         prompt_prefix=prompt_prefix,  # Pass prompt_prefix
                         bgm_path=bgm_path,

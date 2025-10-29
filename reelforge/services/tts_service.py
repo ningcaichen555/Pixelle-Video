@@ -1,39 +1,29 @@
 """
-TTS (Text-to-Speech) Service - Dual implementation (Edge TTS + ComfyUI)
+TTS (Text-to-Speech) Service - ComfyUI Workflow-based implementation
 """
 
-import uuid
 from typing import Optional
 
 from comfykit import ComfyKit
 from loguru import logger
 
 from reelforge.services.comfy_base_service import ComfyBaseService
-from reelforge.utils.os_util import get_temp_path
 
 
 class TTSService(ComfyBaseService):
     """
-    TTS (Text-to-Speech) service - Dual implementation
+    TTS (Text-to-Speech) service - Workflow-based
     
-    Supports two TTS methods:
-    1. Edge TTS (default) - Free, local SDK, no workflow needed
-    2. ComfyUI Workflow - Workflow-based, requires ComfyUI setup
+    Uses ComfyKit to execute TTS workflows.
     
     Usage:
-        # Use default (edge-tts)
+        # Use default workflow
         audio_path = await reelforge.tts(text="Hello, world!")
         
-        # Explicitly use edge-tts
+        # Use specific workflow
         audio_path = await reelforge.tts(
             text="你好，世界！",
-            workflow="edge"
-        )
-        
-        # Use ComfyUI workflow
-        audio_path = await reelforge.tts(
-            text="Hello",
-            workflow="tts_comfyui.json"
+            workflow="tts_edge.json"
         )
         
         # List available workflows
@@ -41,11 +31,8 @@ class TTSService(ComfyBaseService):
     """
     
     WORKFLOW_PREFIX = "tts_"
-    DEFAULT_WORKFLOW = "edge"  # Default to edge-tts
+    DEFAULT_WORKFLOW = None  # No hardcoded default, must be configured
     WORKFLOWS_DIR = "workflows"
-    
-    # Built-in providers (not workflow files)
-    BUILTIN_PROVIDERS = ["edge", "edge-tts"]
     
     def __init__(self, config: dict):
         """
@@ -56,81 +43,53 @@ class TTSService(ComfyBaseService):
         """
         super().__init__(config, service_name="tts")
     
-    def _resolve_workflow(self, workflow: Optional[str] = None) -> str:
-        """
-        Resolve workflow to actual workflow path or provider name
-        
-        Args:
-            workflow: Workflow filename or provider name (e.g., "edge", "tts_default.json")
-        
-        Returns:
-            Workflow file path or provider name
-        """
-        # 1. If not specified, use default
-        if workflow is None:
-            workflow = self._get_default_workflow()
-        
-        # 2. If it's a built-in provider, return as-is
-        if workflow in self.BUILTIN_PROVIDERS:
-            logger.debug(f"Using built-in TTS provider: {workflow}")
-            return workflow
-        
-        # 3. Otherwise, treat as workflow file (use parent logic)
-        return super()._resolve_workflow(workflow)
     
     async def __call__(
         self,
         text: str,
         workflow: Optional[str] = None,
-        # ComfyUI connection (optional overrides, only for workflow mode)
+        # ComfyUI connection (optional overrides)
         comfyui_url: Optional[str] = None,
         runninghub_api_key: Optional[str] = None,
-        # Common TTS parameters (work for both edge-tts and workflows)
+        # TTS parameters
         voice: Optional[str] = None,
-        rate: Optional[str] = None,
-        volume: Optional[str] = None,
-        pitch: Optional[str] = None,
+        speed: float = 1.0,
         # Output path
         output_path: Optional[str] = None,
         **params
     ) -> str:
         """
-        Generate speech using edge-tts or ComfyUI workflow
+        Generate speech using ComfyUI workflow
         
         Args:
             text: Text to convert to speech
-            workflow: Workflow filename or provider name (default: "edge")
-                     - "edge" or "edge-tts": Use local edge-tts SDK
-                     - "tts_xxx.json": Use ComfyUI workflow
-                     - Absolute path/URL/RunningHub ID: Also supported
-            comfyui_url: ComfyUI URL (only for workflow mode)
-            runninghub_api_key: RunningHub API key (only for workflow mode)
-            voice: Voice ID
-            rate: Speech rate (e.g., "+0%", "+50%", "-20%")
-            volume: Speech volume (e.g., "+0%")
-            pitch: Speech pitch (e.g., "+0Hz")
+            workflow: Workflow filename (default: from config)
+            comfyui_url: ComfyUI URL (optional, overrides config)
+            runninghub_api_key: RunningHub API key (optional, overrides config)
+            voice: Voice ID (workflow-specific)
+            speed: Speech speed multiplier (1.0 = normal, >1.0 = faster, <1.0 = slower)
             output_path: Custom output path (auto-generated if None)
-            **params: Additional parameters
+            **params: Additional workflow parameters
         
         Returns:
             Generated audio file path
         
         Examples:
-            # Simplest: use default (edge-tts)
+            # Simplest: use default workflow
             audio_path = await reelforge.tts(text="Hello, world!")
             
-            # Explicitly use edge-tts with parameters
+            # Use specific workflow
             audio_path = await reelforge.tts(
                 text="你好，世界！",
-                workflow="edge",
-                voice="zh-CN-XiaoxiaoNeural",
-                rate="+20%"
+                workflow="tts_edge.json"
             )
             
-            # Use ComfyUI workflow
+            # With voice and speed
             audio_path = await reelforge.tts(
                 text="Hello",
-                workflow="tts_default.json"
+                workflow="tts_edge.json",
+                voice="zh-CN-XiaoxiaoNeural",
+                speed=1.2
             )
             
             # With absolute path
@@ -138,91 +97,27 @@ class TTSService(ComfyBaseService):
                 text="Hello",
                 workflow="/path/to/custom_tts.json"
             )
-        """
-        # 1. Check if it's a builtin provider (edge-tts)
-        if workflow in self.BUILTIN_PROVIDERS or workflow is None and self._get_default_workflow() in self.BUILTIN_PROVIDERS:
-            # Use edge-tts
-            return await self._call_edge_tts(
-                text=text,
-                voice=voice,
-                rate=rate,
-                volume=volume,
-                pitch=pitch,
-                output_path=output_path,
-                **params
+            
+            # With custom ComfyUI server
+            audio_path = await reelforge.tts(
+                text="Hello",
+                comfyui_url="http://192.168.1.100:8188"
             )
-        
-        # 2. Use ComfyUI workflow - resolve to structured info
+        """
+        # 1. Resolve workflow (returns structured info)
         workflow_info = self._resolve_workflow(workflow=workflow)
         
+        # 2. Execute ComfyUI workflow
         return await self._call_comfyui_workflow(
             workflow_info=workflow_info,
             text=text,
             comfyui_url=comfyui_url,
             runninghub_api_key=runninghub_api_key,
             voice=voice,
-            rate=rate,
-            volume=volume,
-            pitch=pitch,
+            speed=speed,
             output_path=output_path,
             **params
         )
-    
-    async def _call_edge_tts(
-        self,
-        text: str,
-        voice: Optional[str] = None,
-        rate: Optional[str] = None,
-        volume: Optional[str] = None,
-        pitch: Optional[str] = None,
-        output_path: Optional[str] = None,
-        **params
-    ) -> str:
-        """
-        Generate speech using edge-tts SDK
-        
-        Args:
-            text: Text to convert to speech
-            voice: Voice ID (default: zh-CN-YunjianNeural)
-            rate: Speech rate (default: +0%)
-            volume: Speech volume (default: +0%)
-            pitch: Speech pitch (default: +0Hz)
-            output_path: Custom output path (auto-generated if None)
-            **params: Additional parameters (e.g., retry_count, retry_delay)
-        
-        Returns:
-            Generated audio file path
-        """
-        from reelforge.utils.tts_util import edge_tts
-        
-        logger.info(f"🎙️  Using edge-tts (local SDK)")
-        
-        # Generate output path (use provided path or auto-generate)
-        if output_path is None:
-            output_path = get_temp_path(f"{uuid.uuid4().hex}.mp3")
-        else:
-            # Ensure parent directory exists
-            import os
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
-        # Call edge-tts with output_path to save directly
-        try:
-            audio_bytes = await edge_tts(
-                text=text,
-                voice=voice or "zh-CN-YunjianNeural",
-                rate=rate or "+0%",
-                volume=volume or "+0%",
-                pitch=pitch or "+0Hz",
-                output_path=output_path,
-                **params
-            )
-            
-            logger.info(f"✅ Generated audio (edge-tts): {output_path}")
-            return output_path
-        
-        except Exception as e:
-            logger.error(f"Edge TTS generation error: {e}")
-            raise
     
     async def _call_comfyui_workflow(
         self,
@@ -231,9 +126,7 @@ class TTSService(ComfyBaseService):
         comfyui_url: Optional[str] = None,
         runninghub_api_key: Optional[str] = None,
         voice: Optional[str] = None,
-        rate: Optional[str] = None,
-        volume: Optional[str] = None,
-        pitch: Optional[str] = None,
+        speed: float = 1.0,
         output_path: Optional[str] = None,
         **params
     ) -> str:
@@ -246,9 +139,7 @@ class TTSService(ComfyBaseService):
             comfyui_url: ComfyUI URL
             runninghub_api_key: RunningHub API key
             voice: Voice ID (workflow-specific)
-            rate: Speech rate (workflow-specific)
-            volume: Speech volume (workflow-specific)
-            pitch: Speech pitch (workflow-specific)
+            speed: Speech speed multiplier (workflow-specific)
             output_path: Custom output path (downloads if URL returned)
             **params: Additional workflow parameters
         
@@ -269,12 +160,8 @@ class TTSService(ComfyBaseService):
         # Add optional TTS parameters
         if voice is not None:
             workflow_params["voice"] = voice
-        if rate is not None:
-            workflow_params["rate"] = rate
-        if volume is not None:
-            workflow_params["volume"] = volume
-        if pitch is not None:
-            workflow_params["pitch"] = pitch
+        if speed != 1.0:
+            workflow_params["speed"] = speed
         
         # Add any additional parameters
         workflow_params.update(params)

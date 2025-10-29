@@ -71,9 +71,7 @@ examples/
 repositories/
 
 # Workflows - ignore user customizations but keep defaults
-workflows/*
-!workflows/*_default.json
-!workflows/README.md
+
 
 # Templates - ignore user customizations but keep presets
 templates/*

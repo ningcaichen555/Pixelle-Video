@@ -93,21 +93,26 @@ class ConfigManager:
             }
         })
     
-    def get_image_config(self) -> dict:
-        """Get image configuration as dict"""
+    def get_comfyui_config(self) -> dict:
+        """Get ComfyUI configuration as dict"""
         return {
-            "default_workflow": self.config.image.default_workflow,
-            "comfyui_url": self.config.image.comfyui_url,
-            "runninghub_api_key": self.config.image.runninghub_api_key,
-            "prompt_prefix": self.config.image.prompt_prefix,
+            "comfyui_url": self.config.comfyui.comfyui_url,
+            "runninghub_api_key": self.config.comfyui.runninghub_api_key,
+            "tts": {
+                "default_workflow": self.config.comfyui.tts.default_workflow,
+            },
+            "image": {
+                "default_workflow": self.config.comfyui.image.default_workflow,
+                "prompt_prefix": self.config.comfyui.image.prompt_prefix,
+            }
         }
     
-    def set_image_config(
+    def set_comfyui_config(
         self, 
         comfyui_url: Optional[str] = None, 
         runninghub_api_key: Optional[str] = None
     ):
-        """Set image configuration"""
+        """Set ComfyUI global configuration"""
         updates = {}
         if comfyui_url is not None:
             updates["comfyui_url"] = comfyui_url
@@ -115,5 +120,5 @@ class ConfigManager:
             updates["runninghub_api_key"] = runninghub_api_key
         
         if updates:
-            self.update({"image": updates})
+            self.update({"comfyui": updates})
 

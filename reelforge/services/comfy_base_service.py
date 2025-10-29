@@ -19,7 +19,7 @@ class ComfyBaseService:
     
     Subclasses should define:
     - WORKFLOW_PREFIX: Prefix for workflow files (e.g., "image_", "tts_")
-    - DEFAULT_WORKFLOW: Default workflow filename (e.g., "image_default.json")
+    - DEFAULT_WORKFLOW: Default workflow filename (e.g., "image_flux.json")
     - WORKFLOWS_DIR: Directory containing workflows (default: "workflows")
     """
     
@@ -35,7 +35,13 @@ class ComfyBaseService:
             config: Full application config dict
             service_name: Service name in config (e.g., "tts", "image")
         """
-        self.config = config.get(service_name, {})
+        # Service-specific config (e.g., config["comfyui"]["tts"])
+        comfyui_config = config.get("comfyui", {})
+        self.config = comfyui_config.get(service_name, {})
+        
+        # Global ComfyUI config (for comfyui_url and runninghub_api_key)
+        self.global_config = comfyui_config
+        
         self.service_name = service_name
         self._workflows_cache: Optional[List[str]] = None
     
@@ -47,18 +53,18 @@ class ComfyBaseService:
             List of workflow info dicts
             Example: [
                 {
-                    "name": "image_default.json",
-                    "display_name": "image_default.json - Selfhost",
+                    "name": "image_flux.json",
+                    "display_name": "image_flux.json - Selfhost",
                     "source": "selfhost",
-                    "path": "workflows/selfhost/image_default.json",
-                    "key": "selfhost/image_default.json"
+                    "path": "workflows/selfhost/image_flux.json",
+                    "key": "selfhost/image_flux.json"
                 },
                 {
-                    "name": "image_default.json",
-                    "display_name": "image_default.json - Runninghub", 
+                    "name": "image_flux.json",
+                    "display_name": "image_flux.json - Runninghub", 
                     "source": "runninghub",
-                    "path": "workflows/runninghub/image_default.json",
-                    "key": "runninghub/image_default.json",
+                    "path": "workflows/runninghub/image_flux.json",
+                    "key": "runninghub/image_flux.json",
                     "workflow_id": "123456"
                 }
             ]
@@ -101,11 +107,11 @@ class ComfyBaseService:
         Returns:
             Workflow info dict with structure:
             {
-                "name": "image_default.json",
-                "display_name": "image_default.json - Runninghub",
+                "name": "image_flux.json",
+                "display_name": "image_flux.json - Runninghub",
                 "source": "runninghub",
-                "path": "workflows/runninghub/image_default.json",
-                "key": "runninghub/image_default.json",
+                "path": "workflows/runninghub/image_flux.json",
+                "key": "runninghub/image_flux.json",
                 "workflow_id": "123456"  # Only for RunningHub
             }
         """
@@ -134,7 +140,7 @@ class ComfyBaseService:
         Get default workflow from config (required, no fallback)
         
         Returns:
-            Default workflow key (e.g., "runninghub/image_default.json")
+            Default workflow key (e.g., "runninghub/image_flux.json")
         
         Raises:
             ValueError: If default_workflow not configured
@@ -155,17 +161,17 @@ class ComfyBaseService:
         Resolve workflow key to workflow info
         
         Args:
-            workflow: Workflow key (e.g., "runninghub/image_default.json")
+            workflow: Workflow key (e.g., "runninghub/image_flux.json")
                      If None, uses default from config
         
         Returns:
             Workflow info dict with structure:
             {
-                "name": "image_default.json",
-                "display_name": "image_default.json - Runninghub",
+                "name": "image_flux.json",
+                "display_name": "image_flux.json - Runninghub",
                 "source": "runninghub",
-                "path": "workflows/runninghub/image_default.json",
-                "key": "runninghub/image_default.json",
+                "path": "workflows/runninghub/image_flux.json",
+                "key": "runninghub/image_flux.json",
                 "workflow_id": "123456"  # Only for RunningHub
             }
         
@@ -210,19 +216,19 @@ class ComfyBaseService:
         """
         kit_config = {}
         
-        # ComfyUI URL (priority: param > config > env > default)
+        # ComfyUI URL (priority: param > global config > env > default)
         final_comfyui_url = (
             comfyui_url 
-            or self.config.get("comfyui_url")
+            or self.global_config.get("comfyui_url")
             or os.getenv("COMFYUI_BASE_URL")
             or "http://127.0.0.1:8188"
         )
         kit_config["comfyui_url"] = final_comfyui_url
         
-        # RunningHub API key (priority: param > config > env)
+        # RunningHub API key (priority: param > global config > env)
         final_rh_key = (
             runninghub_api_key
-            or self.config.get("runninghub_api_key")
+            or self.global_config.get("runninghub_api_key")
             or os.getenv("RUNNINGHUB_API_KEY")
         )
         if final_rh_key:
@@ -242,11 +248,11 @@ class ComfyBaseService:
             workflows = service.list_workflows()
             # [
             #     {
-            #         "name": "image_default.json",
-            #         "display_name": "image_default.json - Runninghub",
+            #         "name": "image_flux.json",
+            #         "display_name": "image_flux.json - Runninghub",
             #         "source": "runninghub",
-            #         "path": "workflows/runninghub/image_default.json",
-            #         "key": "runninghub/image_default.json",
+            #         "path": "workflows/runninghub/image_flux.json",
+            #         "key": "runninghub/image_flux.json",
             #         "workflow_id": "123456"
             #     },
             #     ...
@@ -260,7 +266,7 @@ class ComfyBaseService:
         List available workflow keys
         
         Returns:
-            List of available workflow keys (e.g., ["runninghub/image_default.json", ...])
+            List of available workflow keys (e.g., ["runninghub/image_flux.json", ...])
         
         Example:
             print(f"Available workflows: {service.available}")
