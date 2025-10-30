@@ -13,7 +13,7 @@ import streamlit as st
 from loguru import logger
 
 # Import i18n and config manager
-from web.i18n import load_locales, set_language, tr, get_available_languages
+from web.i18n import load_locales, set_language, tr, get_available_languages, get_language
 from reelforge.config import config_manager
 from reelforge.models.progress import ProgressEvent
 
@@ -52,12 +52,10 @@ def safe_rerun():
 
 def init_i18n():
     """Initialize internationalization"""
-    # Load locales if not already loaded
-    load_locales()
-    
-    # Get language from session state or default to Chinese
+    # Locales are already loaded and system language detected on import
+    # Get language from session state or use auto-detected system language
     if "language" not in st.session_state:
-        st.session_state.language = "zh_CN"
+        st.session_state.language = get_language()  # Use auto-detected language
     
     # Set current language
     set_language(st.session_state.language)
@@ -86,7 +84,8 @@ def get_reelforge():
 def init_session_state():
     """Initialize session state variables"""
     if "language" not in st.session_state:
-        st.session_state.language = "zh_CN"
+        # Use auto-detected system language
+        st.session_state.language = get_language()
 
 
 # ============================================================================
