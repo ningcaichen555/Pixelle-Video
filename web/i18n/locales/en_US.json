@@ -45,6 +45,12 @@
     "style.workflow": "Workflow Selection",
     "style.workflow_what": "Determines how each frame's illustration is generated and its effect (e.g., using FLUX, SD models)",
     "style.workflow_how": "Place image_xxx.json workflow files in workflows/selfhost/ (local ComfyUI) or workflows/runninghub/ (cloud) folder",
+    "style.image_size": "Image Size",
+    "style.image_width": "Width",
+    "style.image_height": "Height",
+    "style.image_width_help": "Width of AI-generated images (Note: This is the image size, not the final video size. Video size is determined by the template)",
+    "style.image_height_help": "Height of AI-generated images (Note: This is the image size, not the final video size. Video size is determined by the template)",
+    "style.image_size_note": "Image size controls the dimensions of AI-generated illustrations, and does not affect the final video size. Video size is determined by the Storyboard Template below.",
     "style.prompt_prefix": "Prompt Prefix",
     "style.prompt_prefix_what": "Automatically added before all image prompts to control the illustration style uniformly (e.g., cartoon, realistic)",
     "style.prompt_prefix_how": "Enter style description in the input box below. To save permanently, edit the config.yaml file",
@@ -68,6 +74,7 @@
     "template.selector": "Template Selection",
     "template.select": "Select Template",
     "template.select_help": "Select template and video size",
+    "template.video_size_info": "Final Video Size: {width} × {height}",
     "template.separator_selected": "Please select a specific template, not the group header",
     "template.default": "Default",
     "template.modern": "Modern",
@@ -198,6 +205,7 @@
     "help.feature_description": "💡 Feature Description",
     "help.what": "Purpose",
     "help.how": "Customization",
+    "help.note": "Note",
     
     "language.select": "🌐 Language"
   }

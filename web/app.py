@@ -548,6 +548,8 @@ def main():
                 st.markdown(tr("style.workflow_what"))
                 st.markdown(f"**{tr('help.how')}**")
                 st.markdown(tr("style.workflow_how"))
+                st.markdown(f"**{tr('help.note')}**")
+                st.markdown(tr("style.image_size_note"))
             
             # Get available workflows from pixelle_video (with source info)
             workflows = pixelle_video.image.list_workflows()
@@ -583,19 +585,38 @@ def main():
                 workflow_key = "runninghub/image_flux.json"  # fallback
             
             
-            # 2. Prompt prefix input
-            st.markdown(f"**{tr('style.prompt_prefix')}**")
+            # 2. Image size input
+            col1, col2 = st.columns(2)
+            with col1:
+                image_width = st.number_input(
+                    tr('style.image_width'),
+                    min_value=128,
+                    value=1024,
+                    step=1,
+                    label_visibility="visible",
+                    help=tr('style.image_width_help')
+                )
+            with col2:
+                image_height = st.number_input(
+                    tr('style.image_height'),
+                    min_value=128,
+                    value=1024,
+                    step=1,
+                    label_visibility="visible",
+                    help=tr('style.image_height_help')
+                )
             
+            # 3. Prompt prefix input
             # Get current prompt_prefix from config
             current_prefix = comfyui_config["image"]["prompt_prefix"]
             
             # Prompt prefix input (temporary, not saved to config)
             prompt_prefix = st.text_area(
-                "Prompt Prefix",
+                tr('style.prompt_prefix'),
                 value=current_prefix,
                 placeholder=tr("style.prompt_prefix_placeholder"),
                 height=80,
-                label_visibility="collapsed",
+                label_visibility="visible",
                 help=tr("style.prompt_prefix_help")
             )
             
@@ -618,12 +639,12 @@ def main():
                             # Build final prompt with prefix
                             final_prompt = build_image_prompt(test_prompt, prompt_prefix)
                             
-                            # Generate preview image (small size for speed)
+                            # Generate preview image (use user-specified size)
                             preview_image_path = run_async(pixelle_video.image(
                                 prompt=final_prompt,
                                 workflow=workflow_key,
-                                width=512,
-                                height=512
+                                width=int(image_width),
+                                height=int(image_height)
                             ))
                             
                             # Display preview (support both URL and local path)
@@ -733,6 +754,11 @@ def main():
             
             # Get full template path
             frame_template = template_path_map.get(selected_display_name)
+            
+            # Display video size from template
+            from pixelle_video.utils.template_util import parse_template_size
+            video_width, video_height = parse_template_size(frame_template)
+            st.caption(tr("template.video_size_info", width=video_width, height=video_height))
             
             # Template preview expander
             with st.expander(tr("template.preview_title"), expanded=False):
@@ -867,6 +893,8 @@ def main():
                         "n_scenes": n_scenes,
                         "tts_workflow": tts_workflow_key,
                         "image_workflow": workflow_key,
+                        "image_width": int(image_width),
+                        "image_height": int(image_height),
                         "frame_template": frame_template,
                         "prompt_prefix": prompt_prefix,
                         "bgm_path": bgm_path,

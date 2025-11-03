@@ -45,6 +45,12 @@
     "style.workflow": "工作流选择",
     "style.workflow_what": "决定视频中每帧插图的生成方式和效果（如使用 FLUX、SD 等模型）",
     "style.workflow_how": "将 image_xxx.json 工作流文件放入 workflows/selfhost/（本地 ComfyUI）或 workflows/runninghub/（云端）文件夹",
+    "style.image_size": "图片尺寸",
+    "style.image_width": "宽度",
+    "style.image_height": "高度",
+    "style.image_width_help": "AI 生成插图的宽度（注意：这是插图尺寸，不是最终视频尺寸。视频尺寸由模板决定）",
+    "style.image_height_help": "AI 生成插图的高度（注意：这是插图尺寸，不是最终视频尺寸。视频尺寸由模板决定）",
+    "style.image_size_note": "图片尺寸控制 AI 生成的插图大小，不影响最终视频尺寸。视频尺寸由下方的「📐 分镜模板」决定。",
     "style.prompt_prefix": "提示词前缀",
     "style.prompt_prefix_what": "自动添加到所有图片提示词前面，统一控制插图风格（如：卡通风格、写实风格等）",
     "style.prompt_prefix_how": "直接在下方输入框填写风格描述。若要永久保存，需编辑 config.yaml 文件",
@@ -68,6 +74,7 @@
     "template.selector": "模板选择",
     "template.select": "选择模板",
     "template.select_help": "选择模板和视频尺寸",
+    "template.video_size_info": "最终视频尺寸：{width} × {height}",
     "template.separator_selected": "请选择具体的模板，而不是分组标题",
     "template.default": "默认",
     "template.modern": "现代",
@@ -198,6 +205,7 @@
     "help.feature_description": "💡 功能说明",
     "help.what": "作用",
     "help.how": "自定义方式",
+    "help.note": "注意",
     
     "language.select": "🌐 语言"
   }
