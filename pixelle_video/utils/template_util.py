@@ -4,7 +4,8 @@ Template utility functions for size parsing and template management
 
 import os
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Literal
+from pydantic import BaseModel, Field
 
 
 def parse_template_size(template_path: str) -> Tuple[int, int]:
@@ -152,6 +153,113 @@ def get_template_full_path(size: str, template_name: str) -> str:
         )
     
     return str(template_path)
+
+
+class TemplateDisplayInfo(BaseModel):
+    """Template display information for UI layer"""
+    
+    name: str = Field(..., description="Template name without extension")
+    size: str = Field(..., description="Size string like '1080x1920'")
+    width: int = Field(..., description="Width in pixels")
+    height: int = Field(..., description="Height in pixels")
+    orientation: Literal['portrait', 'landscape', 'square'] = Field(
+        ..., 
+        description="Video orientation"
+    )
+    is_standard: bool = Field(
+        ..., 
+        description="True only for standard sizes: 1080x1920, 1920x1080, 1080x1080"
+    )
+
+
+class TemplateInfo(BaseModel):
+    """Complete template information with path and display info"""
+    
+    template_path: str = Field(..., description="Full template path like '1080x1920/default.html'")
+    display_info: TemplateDisplayInfo = Field(..., description="Display information")
+
+
+def format_template_display_info(template_name: str, size: str) -> TemplateDisplayInfo:
+    """
+    Format template display information for UI
+    
+    Returns structured data for UI layer to handle display and i18n.
+    
+    Args:
+        template_name: Template filename like "default.html"
+        size: Size string like "1080x1920"
+    
+    Returns:
+        TemplateDisplayInfo object with name, size, dimensions, orientation, and standard flag
+    
+    Examples:
+        >>> info = format_template_display_info("default.html", "1080x1920")
+        >>> info.name
+        'default'
+        >>> info.is_standard
+        True
+        
+        >>> info = format_template_display_info("custom.html", "1080x1921")
+        >>> info.orientation
+        'portrait'
+        >>> info.is_standard
+        False
+    """
+    # Keep full template name with .html extension
+    name = template_name
+    
+    # Parse size
+    width, height = map(int, size.split('x'))
+    
+    # Detect orientation
+    if height > width:
+        orientation = 'portrait'
+    elif width > height:
+        orientation = 'landscape'
+    else:
+        orientation = 'square'
+    
+    # Check if it's a standard size (only these three)
+    is_standard = (width, height) in [(1080, 1920), (1920, 1080), (1080, 1080)]
+    
+    return TemplateDisplayInfo(
+        name=name,
+        size=size,
+        width=width,
+        height=height,
+        orientation=orientation,
+        is_standard=is_standard
+    )
+
+
+def get_all_templates_with_info() -> List[TemplateInfo]:
+    """
+    Get all templates with their display information
+    
+    Returns:
+        List of TemplateInfo objects
+    
+    Example:
+        >>> templates = get_all_templates_with_info()
+        >>> for t in templates:
+        ...     print(f"{t.display_info.name} - {t.display_info.orientation}")
+        ...     print(f"  Path: {t.template_path}")
+        ...     print(f"  Standard: {t.display_info.is_standard}")
+    """
+    result = []
+    sizes = list_available_sizes()
+    
+    for size in sizes:
+        templates = list_templates_for_size(size)
+        for template in templates:
+            display_info = format_template_display_info(template, size)
+            full_path = f"{size}/{template}"
+            result.append(TemplateInfo(
+                template_path=full_path,
+                display_info=display_info
+            ))
+    
+    return result
 
 
 def resolve_template_path(template_input: Optional[str]) -> str:

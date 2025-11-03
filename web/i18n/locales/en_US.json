@@ -66,11 +66,18 @@
     "style.generated_prompt": "Generated prompt: {prompt}",
     
     "template.selector": "Template Selection",
+    "template.select": "Select Template",
+    "template.select_help": "Select template and video size",
     "template.default": "Default",
     "template.modern": "Modern",
     "template.neon": "Neon",
     "template.what": "Controls the visual layout and design style of each frame (title, text, image arrangement)",
     "template.how": "Place .html template files in the templates/ folder for automatic detection. Supports custom CSS styles",
+    "template.size_info": "Template Size",
+    
+    "orientation.portrait": "Portrait",
+    "orientation.landscape": "Landscape",
+    "orientation.square": "Square",
     "template.preview_title": "Preview Template",
     "template.preview_param_title": "Title",
     "template.preview_param_text": "Text",

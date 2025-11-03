@@ -667,47 +667,52 @@ def main():
                 st.markdown(tr("template.how"))
             
             # Import template utilities
-            from pixelle_video.utils.template_util import list_available_sizes, list_templates_for_size
+            from pixelle_video.utils.template_util import get_all_templates_with_info
             
-            # Step 1: Select video size
-            VIDEO_SIZE_OPTIONS = {
-                "📱 竖屏视频 (1080×1920)": "1080x1920",
-                "🖥 横屏视频 (1920×1080)": "1920x1080",
-                "⬜ 方形视频 (1080×1080)": "1080x1080",
-            }
+            # Get all templates with their info
+            all_templates = get_all_templates_with_info()
             
-            # Filter available sizes (only show sizes that exist)
-            available_sizes = list_available_sizes()
-            available_size_options = {k: v for k, v in VIDEO_SIZE_OPTIONS.items() if v in available_sizes}
-            
-            if not available_size_options:
-                st.error("No template sizes found. Please ensure templates are in correct directory structure.")
+            if not all_templates:
+                st.error("No templates found. Please ensure templates are in templates/ directory with proper structure (e.g., templates/1080x1920/default.html).")
                 st.stop()
             
-            selected_size_label = st.selectbox(
-                tr("template.video_size"),
-                list(available_size_options.keys()),
-                label_visibility="collapsed"
+            # Build display names with i18n
+            ORIENTATION_I18N = {
+                'portrait': tr('orientation.portrait'),
+                'landscape': tr('orientation.landscape'),
+                'square': tr('orientation.square')
+            }
+            
+            display_options = {}
+            for item in all_templates:
+                info = item.display_info
+                name = info.name
+                orientation = ORIENTATION_I18N.get(info.orientation, info.orientation)
+                
+                # Always show dimensions for standardization
+                display_name = f"{name} - {orientation}（{info.width}×{info.height}）"
+                
+                display_options[display_name] = item.template_path
+            
+            # Default to "default" portrait if exists
+            display_names = list(display_options.keys())
+            default_index = 0
+            for idx, name in enumerate(display_names):
+                if "default" in name.lower() and tr('orientation.portrait') in name:
+                    default_index = idx
+                    break
+            
+            # Single dropdown with formatted names
+            selected_display_name = st.selectbox(
+                tr("template.select"),
+                display_names,
+                index=default_index,
+                label_visibility="collapsed",
+                help=tr("template.select_help")
             )
-            selected_size = available_size_options[selected_size_label]
             
-            # Step 2: Select template for the chosen size
-            template_files = list_templates_for_size(selected_size)
-            
-            # Default to default.html if exists, otherwise first option
-            default_template_index = 0
-            if "default.html" in template_files:
-                default_template_index = template_files.index("default.html")
-            
-            template_name = st.selectbox(
-                tr("template.style"),
-                template_files if template_files else ["default.html"],
-                index=default_template_index,
-                label_visibility="collapsed"
-            )
-            
-            # Combine size and template name to get full path
-            frame_template = f"{selected_size}/{template_name}"
+            # Get full template path
+            frame_template = display_options[selected_display_name]
             
             # Template preview expander
             with st.expander(tr("template.preview_title"), expanded=False):
