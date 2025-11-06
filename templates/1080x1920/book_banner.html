@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <title>书封横幅风 - 1080x1920</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { width: 1080px; height: 1920px; overflow: hidden; }
+
+        body {
+            font-family: 'PingFang SC', 'Source Han Sans', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f2b4e;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        /* 顶部标题区 */
+        .top {
+            height: 28%;
+            background: #0f2b4e; /* 深蓝 */
+            padding: 80px 70px 40px 70px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .headline-main {
+            font-weight: 900;
+            font-size: 84px;
+            color: #ffffff;
+            text-shadow: 0 4px 18px rgba(0,0,0,0.35);
+        }
+
+        /* 顶部分隔线 */
+        .divider { height: 8px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); box-shadow: inset 0 -2px 0 rgba(0,0,0,0.25); }
+
+        /* 中部图片区 */
+        .middle {
+            height: 56%;
+            background: #0c0f16;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-frame { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
+
+        .image-mask { position: absolute; inset: 0; padding: 28px 28px 100px 28px; }
+
+        .image-mask > .img { width: 100%; height: 100%; overflow: hidden; background: #121620; box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+
+        .image-mask > .img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* 播放按钮装饰（可选视觉元素） */
+        .play { position: absolute; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.08); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.15); }
+        .play:before { content: ''; width: 0; height: 0; border-left: 58px solid rgba(255,255,255,0.95); border-top: 38px solid transparent; border-bottom: 38px solid transparent; margin-left: 8px; }
+
+        /* 底部字幕条（仅 text 占位符）*/
+        .caption-wrap { position: absolute; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; padding: 0 32px; pointer-events: none; }
+        .caption { display: inline-block; max-width: 96%; font-size: 56px; font-weight: 900; line-height: 1.2; color: #ffffff; text-align: center; text-shadow: 0 0 0 #000, -4px -4px 0 #000, 4px -4px 0 #000, -4px 4px 0 #000, 4px 4px 0 #000, 0 8px 20px rgba(0,0,0,0.65); }
+
+        /* 底部留白区（不再显示品牌/其他占位符） */
+        .bottom { height: 16%; background: #0f2b4e; }
+
+        @media (max-width: 1080px) { .headline-main { font-size: 72px; } .caption { font-size: 48px; } }
+    </style>
+</head>
+<body>
+    <div class="top">
+        <div class="headline-main">{{title}}</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="middle">
+        <div class="image-frame">
+            <div class="image-mask">
+                <div class="img"><img src="{{image}}" alt="内容图片"></div>
+            </div>
+            <div class="play" aria-hidden="true"></div>
+            <div class="caption-wrap"><div class="caption">{{text}}</div></div>
+        </div>
+    </div>
+
+    <div class="bottom"></div>
+</body>
+</html>

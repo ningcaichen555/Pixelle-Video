@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <title>视频模板 - 自然清新风格</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 1080px;
+            height: 1920px;
+            overflow: hidden;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #d1fae5 100%);
+            font-family: 'Inter', 'PingFang SC', 'Source Han Sans', sans-serif;
+            display: flex;
+            position: relative;
+            color: #065f46;
+        }
+        
+        /* 背景装饰 */
+        .bg-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* 清新光晕 */
+        .fresh-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+        }
+        
+        .glow-1 {
+            width: 750px;
+            height: 750px;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.25), transparent);
+            top: -300px;
+            left: -200px;
+        }
+        
+        .glow-2 {
+            width: 650px;
+            height: 650px;
+            background: radial-gradient(circle, rgba(99, 240, 206, 0.2), transparent);
+            bottom: 150px;
+            right: -150px;
+        }
+        
+        .glow-3 {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(209, 250, 229, 0.3), transparent);
+            top: 45%;
+            right: 150px;
+        }
+        
+        /* 装饰叶子形状 */
+        .leaf {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: rgba(52, 211, 153, 0.15);
+            border-radius: 60% 0 60% 0;
+            transform: rotate(45deg);
+        }
+        
+        .leaf-1 {
+            top: 20%;
+            right: 100px;
+            box-shadow: 0 0 30px rgba(52, 211, 153, 0.2);
+        }
+        
+        .leaf-2 {
+            bottom: 30%;
+            left: 80px;
+            transform: rotate(-30deg);
+            box-shadow: 0 0 30px rgba(99, 240, 206, 0.2);
+        }
+        
+        /* 装饰圆形 */
+        .circle-deco {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid rgba(52, 211, 153, 0.25);
+            background: transparent;
+        }
+        
+        .circle-1 {
+            width: 150px;
+            height: 150px;
+            top: 15%;
+            right: 150px;
+            box-shadow: 0 0 40px rgba(52, 211, 153, 0.15);
+        }
+        
+        .circle-2 {
+            width: 120px;
+            height: 120px;
+            bottom: 25%;
+            left: 120px;
+            box-shadow: 0 0 40px rgba(99, 240, 206, 0.15);
+        }
+        
+        /* 装饰线条 */
+        .wave-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.4), transparent);
+            border-radius: 15px;
+        }
+        
+        .wave-1 {
+            width: 400px;
+            top: 22%;
+            left: 60px;
+            transform: rotate(-10deg) scaleY(1.5);
+        }
+        
+        .wave-2 {
+            width: 350px;
+            top: 62%;
+            right: 100px;
+            transform: rotate(15deg) scaleY(1.5);
+        }
+        
+        /* 装饰点 */
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(52, 211, 153, 0.4);
+        }
+        
+        .dot-1 {
+            width: 16px;
+            height: 16px;
+            top: 18%;
+            left: 200px;
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+        }
+        
+        .dot-2 {
+            width: 12px;
+            height: 12px;
+            top: 58%;
+            right: 180px;
+            box-shadow: 0 0 20px rgba(99, 240, 206, 0.5);
+        }
+        
+        .dot-3 {
+            width: 14px;
+            height: 14px;
+            bottom: 22%;
+            left: 150px;
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+        }
+        
+        /* 主容器 */
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 80px 60px 70px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 标题区域 */
+        .header {
+            margin-bottom: 70px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .title-badge {
+            display: inline-block;
+            padding: 8px 24px;
+            background: rgba(52, 211, 153, 0.15);
+            border: 2px solid rgba(52, 211, 153, 0.4);
+            border-radius: 30px;
+            font-size: 22px;
+            color: #059669;
+            margin-bottom: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .title {
+            font-size: 78px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #064e3b;
+            letter-spacing: -1px;
+            margin-bottom: 0;
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 2px 10px rgba(52, 211, 153, 0.2);
+        }
+        
+        .title::before,
+        .title::after {
+            content: '🌿';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            opacity: 0.6;
+        }
+        
+        .title::before {
+            left: -70px;
+        }
+        
+        .title::after {
+            right: -70px;
+        }
+        
+        /* 图片区域 */
+        .image-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin: 40px 0;
+        }
+        
+        .image-container {
+            width: 900px;
+            height: 900px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            border: 4px solid rgba(52, 211, 153, 0.2);
+            box-shadow: 
+                0 25px 80px rgba(52, 211, 153, 0.15),
+                0 10px 30px rgba(0, 0, 0, 0.06),
+                inset 0 0 0 1px rgba(52, 211, 153, 0.1);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* 装饰角标 */
+        .corner-leaf {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(52, 211, 153, 0.2);
+            border-radius: 0 100% 0 100%;
+            z-index: 10;
+        }
+        
+        .corner-leaf.top-left {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .corner-leaf.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-radius: 100% 0 100% 0;
+            background: rgba(99, 240, 206, 0.2);
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0;
+            position: relative;
+        }
+        
+        .content-text {
+            font-size: 42px;
+            font-weight: 500;
+            line-height: 1.8;
+            color: #065f46;
+            max-width: 88%;
+            position: relative;
+            padding: 50px 60px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 30px;
+            border: 2px solid rgba(52, 211, 153, 0.25);
+            box-shadow: 
+                0 20px 50px rgba(52, 211, 153, 0.12),
+                0 5px 15px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* 底部装饰 */
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0 0;
+            margin-top: auto;
+            gap: 12px;
+        }
+        
+        .accent-circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        .accent-circle:nth-child(1) { width: 14px; height: 14px; }
+        .accent-circle:nth-child(2) { width: 10px; height: 10px; }
+        .accent-circle:nth-child(3) { width: 12px; height: 12px; }
+        
+        /* 响应式 */
+        @media (max-width: 1080px) {
+            .container {
+                padding: 70px 50px 60px;
+            }
+            
+            .title {
+                font-size: 66px;
+            }
+            
+            .image-container {
+                width: 800px;
+                height: 800px;
+            }
+            
+            .content-text {
+                font-size: 36px;
+                padding: 40px 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+        <div class="fresh-glow glow-1"></div>
+        <div class="fresh-glow glow-2"></div>
+        <div class="fresh-glow glow-3"></div>
+        
+        <div class="leaf leaf-1"></div>
+        <div class="leaf leaf-2"></div>
+        
+        <div class="circle-deco circle-1"></div>
+        <div class="circle-deco circle-2"></div>
+        
+        <div class="wave-line wave-1"></div>
+        <div class="wave-line wave-2"></div>
+        
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
+    </div>
+    
+    <!-- 主要内容容器 -->
+    <div class="container">
+        <!-- 标题区域 -->
+        <div class="header">
+            <div class="title-badge">NATURE</div>
+            <div class="title">{{title}}</div>
+        </div>
+        
+        <!-- 图片区域 -->
+        <div class="image-section">
+            <div class="image-container">
+                <img src="{{image}}" alt="内容图片">
+                <div class="corner-leaf top-left"></div>
+                <div class="corner-leaf bottom-right"></div>
+            </div>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="content-section">
+            <div class="content-text">{{text}}</div>
+        </div>
+        
+        <!-- 底部装饰条 -->
+        <div class="footer">
+            <div class="accent-circle"></div>
+            <div class="accent-circle"></div>
+            <div class="accent-circle"></div>
+        </div>
+    </div>
+</body>
+</html>
+
