@@ -393,7 +393,8 @@ class FrameProcessor:
         from pixelle_video.utils.os_util import get_task_frame_path
         output_path = get_task_frame_path(task_id, frame_index, media_type)
         
-        async with httpx.AsyncClient() as client:
+        timeout = httpx.Timeout(connect=10.0, read=60, write=60, pool=60)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.get(url)
             response.raise_for_status()
             
