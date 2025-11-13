@@ -1048,11 +1048,6 @@ def main():
                         st.markdown(tr('style.video_workflow_how'))
                     else:
                         st.markdown(tr("style.workflow_how"))
-                    st.markdown(f"**{tr('help.note')}**")
-                    if template_media_type == "video":
-                        st.markdown(tr('style.video_size_note'))
-                    else:
-                        st.markdown(tr("style.image_size_note"))
             
                 # Get available workflows and filter by template type
                 all_workflows = pixelle_video.media.list_workflows()
