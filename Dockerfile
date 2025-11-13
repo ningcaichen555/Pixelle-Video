@@ -53,10 +53,9 @@ COPY pixelle_video ./pixelle_video
 # Set longer timeout and reduce concurrent downloads for stability
 RUN if [ "$USE_CN_MIRROR" = "true" ] && [ "$UV_INDEX_URL" = "https://pypi.org/simple" ]; then \
         export UV_HTTP_TIMEOUT=300 && \
-        export UV_CONCURRENT_DOWNLOADS=2 && \
-        uv sync --frozen --no-dev --index-url https://pypi.tuna.tsinghua.edu.cn/simple/ || \
         uv sync --frozen --no-dev --index-url https://mirrors.aliyun.com/pypi/simple/; \
     else \
+        export UV_HTTP_TIMEOUT=300 && \
         uv sync --frozen --no-dev --index-url $UV_INDEX_URL; \
     fi
 
