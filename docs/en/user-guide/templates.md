@@ -137,6 +137,14 @@ Suitable for TikTok, Kuaishou, Xiaohongshu, and other short video platforms.
     ![book](../../images/1080x1920/book.jpg)
     
     Book style, suitable for book lists
+
+-   **Long Text**
+
+    ---
+
+    ![long_text](../../images/1080x1920/long_text.jpg)
+    
+    Long text style, suitable for inspirational content
 </div>
 
 ---
