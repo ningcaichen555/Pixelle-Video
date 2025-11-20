@@ -41,9 +41,7 @@ from pixelle_video.utils.content_generators import (
 )
 
 
-# Whether to enable parallel processing for RunningHub workflows
-RUNNING_HUB_PARALLEL_ENABLED = True
-# Parallel limit for RunningHub workflows
+# Parallel limit for RunningHub workflows (Call by sequential if set to 1)
 RUNNING_HUB_PARALLEL_LIMIT = 1
 
 
@@ -379,7 +377,7 @@ class StandardPipeline(BasePipeline):
                 (config.image_workflow and config.image_workflow.startswith("runninghub/"))
             )
             
-            if is_runninghub and RUNNING_HUB_PARALLEL_ENABLED and RUNNING_HUB_PARALLEL_LIMIT > 1:
+            if is_runninghub and RUNNING_HUB_PARALLEL_LIMIT > 1:
                 logger.info(f"🚀 Using parallel processing for RunningHub workflows (max {RUNNING_HUB_PARALLEL_LIMIT} concurrent)")
                 logger.info(f"   TTS: {'runninghub' if config.tts_workflow and config.tts_workflow.startswith('runninghub/') else 'local'}")
                 logger.info(f"   Image: {'runninghub' if config.image_workflow and config.image_workflow.startswith('runninghub/') else 'local'}")
