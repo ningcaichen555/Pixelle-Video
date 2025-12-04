@@ -37,16 +37,16 @@ class AssetBasedPipelineUI(PipelineUI):
     UI for the Asset-Based Video Generation Pipeline.
     Generates videos from user-provided assets (images/videos).
     """
-    name = "asset_based"
-    icon = "📦"
+    name = "custom_media"
+    icon = "🎨"
     
     @property
     def display_name(self):
-        return tr("pipeline.asset_based.name")
+        return tr("pipeline.custom_media.name")
     
     @property
     def description(self):
-        return tr("pipeline.asset_based.description")
+        return tr("pipeline.custom_media.description")
     
     def render(self, pixelle_video: Any):
         # Three-column layout

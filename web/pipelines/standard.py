@@ -33,12 +33,16 @@ class StandardPipelineUI(PipelineUI):
     UI for the Standard Video Generation Pipeline.
     Implements the classic 3-column layout.
     """
-    name = "standard"
-    icon = "🎬"
+    name = "quick_create"
+    icon = "⚡"
     
     @property
     def display_name(self):
-        return tr("pipeline.standard.name")
+        return tr("pipeline.quick_create.name")
+    
+    @property
+    def description(self):
+        return tr("pipeline.quick_create.description")
     
     def render(self, pixelle_video: Any):
         # Three-column layout

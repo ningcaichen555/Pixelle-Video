@@ -31,6 +31,15 @@ Just input a **topic**, and Pixelle-Video will automatically:
 
 ## 📋 Changelog
 
+### 2025-12-04
+
+- 🎨 **New "Custom Media" Feature** - Support uploading your own photos and videos:
+  - 📸 **Smart Image Analysis**: AI automatically recognizes image content and generates accurate descriptions
+  - 🎥 **Video Understanding**: Supports video asset analysis to understand scenes and content
+  - ✍️ **Intelligent Script Generation**: Auto-generates video scripts and narration based on asset content and user intent
+  - 🎬 **One-Click Production**: Transform your photos/videos into complete videos with scripts and voiceover
+- 💡 Lower the creative barrier for users without existing media assets
+
 ### 2025-11-18
 
 - Optimized RunningHub service calls with parallel processing for significantly faster speed
