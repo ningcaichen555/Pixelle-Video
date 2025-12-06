@@ -34,7 +34,7 @@ if str(_project_root) not in sys.path:
 
 import argparse
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
@@ -107,24 +107,6 @@ app = FastAPI(
     openapi_url=api_config.openapi_url,
     lifespan=lifespan,
 )
-
-# Add middleware for handling reverse proxy headers (Nginx/Traefik)
-@app.middleware("http")
-async def handle_forwarded_proto(request: Request, call_next):
-    """
-    Handle X-Forwarded-Proto header from reverse proxy
-    
-    This ensures that request.base_url returns the correct protocol (https)
-    when the application is behind a reverse proxy like Nginx or Traefik.
-    """
-    # Check for X-Forwarded-Proto header (standard)
-    forwarded_proto = request.headers.get("x-forwarded-proto")
-    if forwarded_proto:
-        # Update the request scheme
-        request.scope["scheme"] = forwarded_proto
-    
-    response = await call_next(request)
-    return response
 
 # Add CORS middleware
 if api_config.cors_enabled:
