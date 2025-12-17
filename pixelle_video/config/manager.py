@@ -128,6 +128,7 @@ class ConfigManager:
         """Get ComfyUI configuration as dict"""
         return {
             "comfyui_url": self.config.comfyui.comfyui_url,
+            "comfyui_api_key": self.config.comfyui.comfyui_api_key,
             "runninghub_api_key": self.config.comfyui.runninghub_api_key,
             "tts": {
                 "default_workflow": self.config.comfyui.tts.default_workflow,
