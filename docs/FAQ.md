@@ -7,7 +7,7 @@ If you want to integrate your own ComfyUI workflows, please follow these specifi
 1.  **Run Locally First**: Ensure the workflow runs correctly in your local ComfyUI.
 2.  **Parameter Binding**: Find the Text node (CLIP Text Encode or similar text input node) where prompt words need to be dynamically passed by the program.
     -   Edit the **Title** of that node.
-    -   Change the title to `$.prompt.text!` or `$.prompt.value!` (depending on the input type accepted by the node).
+    -   Change the title to `$prompt.text!` or `$prompt.value!` (depending on the input type accepted by the node).
      <img src="https://github.com/user-attachments/assets/ddb1962c-9272-486f-84ab-8019c3fb5bf4" width="600" alt="参数绑定示例" />
 
     -   *Reference Example: Check the editing method of existing JSON files in the `workflows/selfhost/` directory.*

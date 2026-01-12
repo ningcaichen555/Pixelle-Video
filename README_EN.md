@@ -30,22 +30,17 @@ Just input a **topic**, and Pixelle-Video will automatically:
 ![Web UI Interface](resources/webui_en.png)
 
 
-## 📋 Changelog
+## 📋 Recent Updates
 
-### 2025-12-04
-
-- 🎨 **New "Custom Media" Feature** - Support uploading your own photos and videos:
-  - 📸 **Smart Image Analysis**: AI automatically recognizes image content and generates accurate descriptions
-  - 🎥 **Video Understanding**: Supports video asset analysis to understand scenes and content
-  - ✍️ **Intelligent Script Generation**: Auto-generates video scripts and narration based on asset content and user intent
-  - 🎬 **One-Click Production**: Transform your photos/videos into complete videos with scripts and voiceover
-- 💡 Lower the creative barrier for users without existing media assets
-
-### 2025-11-18
-
-- Optimized RunningHub service calls with parallel processing for significantly faster speed
-- Added history page to view and manage all generated videos
-- Support creating multiple video tasks at once for efficient batch production
+- ✅ **2026-01-06**: Added RunningHub 48G VRAM machine support
+- ✅ **2025-12-28**: Configurable RunningHub concurrency limit, improved LLM structured data response handling
+- ✅ **2025-12-17**: Added ComfyUI API Key configuration, Nano Banana model support, API template custom parameters
+- ✅ **2025-12-10**: Built-in FAQ in sidebar, fixed edge-tts version to resolve TTS service instability
+- ✅ **2025-12-08**: Support multiple script split modes (paragraph/line/sentence), improved template selection with direct preview
+- ✅ **2025-12-06**: Fixed video generation API URL path handling with cross-platform compatibility
+- ✅ **2025-12-05**: Added Windows all-in-one package download, optimized image and video analysis workflows
+- ✅ **2025-12-04**: New "Custom Media" feature - upload your photos/videos with AI-powered analysis and script generation
+- ✅ **2025-11-18**: Parallel processing for RunningHub, added history page, batch video task creation support
 
 
 ## ✨ Key Features

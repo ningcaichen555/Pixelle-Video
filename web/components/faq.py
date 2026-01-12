@@ -14,6 +14,7 @@
 FAQ component for displaying frequently asked questions
 """
 
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -57,6 +58,50 @@ def load_faq_content(language: str) -> Optional[str]:
         return None
 
 
+def parse_faq_sections(content: str) -> list[tuple[str, str]]:
+    """
+    Parse FAQ content into sections by ### headings
+    
+    Args:
+        content: Raw markdown content
+    
+    Returns:
+        List of (question, answer) tuples
+    """
+    # Remove the first main heading (starts with #, not ###)
+    lines = content.split('\n')
+    if lines and lines[0].startswith('#') and not lines[0].startswith('##'):
+        content = '\n'.join(lines[1:])
+    
+    # Split by ### headings (top-level questions)
+    # Pattern matches ### at start of line followed by question text
+    pattern = r'^###\s+(.+?)$'
+    
+    sections = []
+    current_question = None
+    current_answer_lines = []
+    
+    for line in content.split('\n'):
+        match = re.match(pattern, line)
+        if match:
+            # Save previous section if exists
+            if current_question is not None:
+                answer = '\n'.join(current_answer_lines).strip()
+                sections.append((current_question, answer))
+            # Start new section
+            current_question = match.group(1).strip()
+            current_answer_lines = []
+        else:
+            current_answer_lines.append(line)
+    
+    # Save last section
+    if current_question is not None:
+        answer = '\n'.join(current_answer_lines).strip()
+        sections.append((current_question, answer))
+    
+    return sections
+
+
 def render_faq_sidebar():
     """
     Render FAQ in the sidebar
@@ -77,14 +122,13 @@ def render_faq_sidebar():
         if faq_content:
             # Display FAQ in an expander, expanded by default
             with st.expander(tr('faq.expand_to_view', fallback='FAQ'), expanded=True):
-                # Remove the first heading from FAQ content since we already show it above
-                lines = faq_content.split('\n')
-                # Skip the first line if it's a heading
-                if lines and lines[0].startswith('#'):
-                    faq_content = '\n'.join(lines[1:])
+                # Parse FAQ into sections
+                sections = parse_faq_sections(faq_content)
                 
-                # Display FAQ content
-                st.markdown(faq_content, unsafe_allow_html=True)
+                # Display each question in its own collapsible expander
+                for question, answer in sections:
+                    with st.expander(question, expanded=False):
+                        st.markdown(answer, unsafe_allow_html=True)
             
             # Add a link to GitHub issues for more help
             st.markdown(

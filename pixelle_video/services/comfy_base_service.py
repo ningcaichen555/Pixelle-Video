@@ -231,6 +231,7 @@ class ComfyBaseService:
         self,
         comfyui_url: Optional[str] = None,
         runninghub_api_key: Optional[str] = None,
+        runninghub_instance_type: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Prepare ComfyKit configuration
@@ -238,6 +239,7 @@ class ComfyBaseService:
         Args:
             comfyui_url: ComfyUI URL (optional, overrides config)
             runninghub_api_key: RunningHub API key (optional, overrides config)
+            runninghub_instance_type: RunningHub instance type (optional, overrides config)
         
         Returns:
             ComfyKit configuration dict
@@ -261,6 +263,16 @@ class ComfyBaseService:
         )
         if final_rh_key:
             kit_config["runninghub_api_key"] = final_rh_key
+        
+        # RunningHub instance type (priority: param > global config > env)
+        # Only pass if non-empty value
+        final_instance_type = (
+            runninghub_instance_type
+            or self.global_config.get("runninghub_instance_type")
+            or os.getenv("RUNNINGHUB_INSTANCE_TYPE")
+        )
+        if final_instance_type and final_instance_type.strip():
+            kit_config["runninghub_instance_type"] = final_instance_type
         
         logger.debug(f"ComfyKit config: {kit_config}")
         return kit_config
