@@ -15,10 +15,19 @@ Async helper functions for web UI
 """
 
 import asyncio
-import tomllib
 from pathlib import Path
 
 from loguru import logger
+
+# Compatibility import for tomllib (Python 3.11+)
+try:
+    import tomllib
+except ImportError:
+    # Fallback for Python < 3.11
+    try:
+        import tomli as tomllib
+    except ImportError:
+        tomllib = None
 
 
 def run_async(coro):
@@ -34,10 +43,19 @@ def get_project_version():
         project_root = web_dir.parent
         pyproject_path = project_root / "pyproject.toml"
         
-        if pyproject_path.exists():
+        if pyproject_path.exists() and tomllib is not None:
             with open(pyproject_path, "rb") as f:
                 pyproject_data = tomllib.load(f)
                 return pyproject_data.get("project", {}).get("version", "Unknown")
+        elif pyproject_path.exists():
+            # Fallback: try to parse version manually
+            with open(pyproject_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                for line in content.split('\n'):
+                    if line.strip().startswith('version = '):
+                        # Extract version from line like: version = "0.1.11"
+                        version = line.split('=')[1].strip().strip('"\'')
+                        return version
     except Exception as e:
         logger.warning(f"Failed to read version from pyproject.toml: {e}")
     return "Unknown"
